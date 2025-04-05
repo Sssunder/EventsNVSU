@@ -1,0 +1,37 @@
+[
+  {
+    "id": "TASK_1",
+    "priority": "LOW",
+    "tags": [],
+    "description": "настроить экраны для пользователя и орга",
+    "status": "TODO"
+  },
+  {
+    "id": "TASK_2",
+    "priority": "LOW",
+    "tags": [],
+    "description": "разобраться с firebase\n",
+    "status": "TODO"
+  },
+  {
+    "id": "TASK_3",
+    "priority": "LOW",
+    "tags": [],
+    "description": "Настроить добавление всего в БД",
+    "status": "TODO"
+  },
+  {
+    "id": "TASK_4",
+    "priority": "LOW",
+    "tags": [],
+    "description": "Сделать красивый экран\n",
+    "status": "TODO"
+  },
+  {
+    "id": "TASK_5",
+    "priority": "LOW",
+    "tags": [],
+    "description": "Добавить навигацию на разные экраны + придумать эти самые экраны",
+    "status": "TODO"
+  }
+]

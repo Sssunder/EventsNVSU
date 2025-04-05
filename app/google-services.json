@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "790006181925",
+    "project_id": "eventsnvsu",
+    "storage_bucket": "eventsnvsu.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790006181925:android:197a485ff2901204dd0fcc",
+        "android_client_info": {
+          "package_name": "com.example.eventsnvsu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "790006181925-dv639goppo9h05rd2f4173f8mhgjjsl7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7LkaNUDSFTeayvcFA-IiosDRr2G9fzfY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "790006181925-dv639goppo9h05rd2f4173f8mhgjjsl7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
