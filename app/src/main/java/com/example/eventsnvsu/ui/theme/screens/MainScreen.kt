@@ -15,11 +15,10 @@ import com.example.eventsnvsu.navigation.AppNavigation
 import com.example.eventsnvsu.navigation.Screen
 import com.example.eventsnvsu.navigation.getIconForRoute
 import com.example.eventsnvsu.navigation.getLabelForRoute
-import com.example.eventsnvsu.viewmodel.AuthViewModel
 
 
 @Composable
-fun MainScreen(navController: NavHostController, authViewModel: AuthViewModel, isOrganizer: Boolean) {
+fun MainScreen(navController: NavHostController, authViewModel: Boolean, isOrganizer: Boolean)  {
     val screens = if (isOrganizer) {
         listOf(
             Screen.OrganizerEvents,

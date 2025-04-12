@@ -1,14 +1,18 @@
 package com.example.eventsnvsu.ui.theme.screens
 
-import FirebaseRepository
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
+import com.example.eventsnvsu.data.FirebaseRepository
+import com.example.eventsnvsu.model.Event
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun CreateEventScreen(navController: NavController) {

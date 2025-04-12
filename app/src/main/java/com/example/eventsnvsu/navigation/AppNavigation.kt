@@ -5,8 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.eventsnvsu.MainScreen
 import com.example.eventsnvsu.ui.theme.screens.LoginScreen
+import com.example.eventsnvsu.ui.theme.screens.MainScreen
 import com.example.eventsnvsu.ui.theme.screens.ProfileScreen
 import com.example.eventsnvsu.ui.theme.screens.RegistrationScreen
 import com.example.eventsnvsu.ui.theme.screens.SearchScreen
