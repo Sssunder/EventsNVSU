@@ -1,4 +1,4 @@
-package com.example.eventsnvsu.ui.theme
+package com.example.eventsnvsu.ui.theme.screens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.filled.*

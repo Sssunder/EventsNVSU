@@ -1,4 +1,4 @@
-package com.example.eventsnvsu.ui.theme
+package com.example.eventsnvsu.ui.theme.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -6,16 +6,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,15 +27,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.eventsnvsu.R
+import com.example.eventsnvsu.navigation.Screen
 import com.example.eventsnvsu.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
-    val context = LocalContext.current // Получаем контекст здесь
+fun RegistrationScreen(navController: NavController, authViewModel: AuthViewModel) {
+    val context = LocalContext.current
+    val email = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+    val selectedRole = remember { mutableStateOf("user") }
     // Контейнер с фоном и центрированным контентом
     Box(
         modifier = Modifier
@@ -59,7 +66,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
 
             // Текст заголовка
             Text(
-                text = "Добро пожаловать!",
+                text = "Регистрация",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -83,50 +90,56 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier.fillMaxWidth()
             )
-
-            // Кнопка для входа
-            Button(
-                onClick = {
-                    // Здесь вы можете добавить код для отправки данных на сервер или сохранения их локально
-                    Toast.makeText(context, "Вход успешен", Toast.LENGTH_SHORT).show()
-                    navController.navigate("event_list_screen") // Перенаправление
-                },
-                shape = RoundedCornerShape(16.dp), // Скругленные углы
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp) // Высота кнопки
-                    .padding(top = 16.dp), // Отступ сверху
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+            Row(Modifier.padding(vertical = 8.dp)) {
+                RadioButton(
+                    selected = selectedRole.value == "user",
+                    onClick = { selectedRole.value = "user" }
                 )
-            ) {
-                Text("Войти", style = MaterialTheme.typography.bodyLarge)
+                Text("Участник", Modifier.align(Alignment.CenterVertically))
+
+                Spacer(Modifier.width(16.dp))
+
+                RadioButton(
+                    selected = selectedRole.value == "organizer",
+                    onClick = { selectedRole.value = "organizer" }
+                )
+                Text("Организатор", Modifier.align(Alignment.CenterVertically))
+            }
+            // Кнопка для регистрации
+            Button(onClick = {
+                authViewModel.register(
+                    email.value,
+                    password.value,
+                    selectedRole.value,
+                    onSuccess = { navController.navigate(Screen.Login.route) },
+                    onFailure = { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+                )
+            }) {
+                Text("Зарегистрироваться")
             }
 
-            // Дополнительная информация или кнопка для регистрации
+            // Дополнительная информация или кнопка для входа
             TextButton(onClick = {
-                // Логика для регистрации или другого действия
-                navController.navigate("registration_screen") // Перенаправление на экран регистрации
+                // Логика для входа или другого действия
+                navController.navigate("login_screen") // Перенаправление на экран входа
             }) {
                 Text(
-                    text = "Создать аккаунт",
+                    text = "Уже есть аккаунт? " +
+                            "\nВойти",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center // Выравнивание текста по центру
                 )
             }
         }
     }
 }
-
-
-
-
-
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
-    LoginScreen(
-        navController = NavController(context = LocalContext.current),
-        authViewModel = AuthViewModel() // Мок для preview
-    )
+fun RegistrationScreenPreview() {
+    val navController = rememberNavController()
+    val authViewModel = AuthViewModel() // Создайте экземпляр AuthViewModel здесь
+    RegistrationScreen(navController, authViewModel)
 }
+
+

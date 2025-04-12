@@ -1,4 +1,4 @@
-package com.example.eventsnvsu.ui.theme
+package com.example.eventsnvsu.ui.theme.screens
 
 import FirebaseRepository
 import android.widget.Toast
