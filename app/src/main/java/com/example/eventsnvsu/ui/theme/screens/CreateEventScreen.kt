@@ -40,7 +40,10 @@ fun CreateEventScreen(navController: NavController) {
 
             repository.createEvent(event,
                 onSuccess = { navController.popBackStack() },
-                onFailure = { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+                onFailure = {
+                    val it = null
+                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                }
             )
         }) {
             Text("Создать мероприятие")

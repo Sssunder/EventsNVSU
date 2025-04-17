@@ -1,4 +1,4 @@
-package com.example.eventsnvsu.ui.screens
+package com.example.eventsnvsu.ui.theme.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

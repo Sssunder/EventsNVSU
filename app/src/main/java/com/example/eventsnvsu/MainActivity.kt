@@ -4,22 +4,30 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
-import com.example.eventsnvsu.navigation.MainNavigationScaffold
+import androidx.compose.material3.Surface
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
+import com.example.eventsnvsu.navigation.AppNavigation
+import com.example.eventsnvsu.ui.theme.EventsNVSUTheme
 import com.example.eventsnvsu.viewmodel.AuthViewModel
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
-
-    private val authViewModel = AuthViewModel() // или через viewModel() позже
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this) // Инициализация Firebase
         setContent {
-            MaterialTheme {
-                MainNavigationScaffold(
-                    isOrganizer = true, // временно вручную
-                    authViewModel = authViewModel
-                )
+            val authViewModel: AuthViewModel = viewModel()
+            val navController = rememberNavController() // Создание navController
+            EventsNVSUTheme {
+                Surface(color = MaterialTheme.colorScheme.background) {
+                    AppNavigation(navController = navController, authViewModel = authViewModel)
+                }
             }
         }
     }
 }
+
+
+
+

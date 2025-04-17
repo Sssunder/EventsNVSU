@@ -1,4 +1,4 @@
-package com.example.eventsnvsu.ui
+package com.example.eventsnvsu.ui.theme.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column

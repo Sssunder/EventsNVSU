@@ -27,7 +27,10 @@ fun AppNavigation(
             RegistrationScreen(navController, authViewModel)
         }
         composable(Screen.Main.route) {
-            MainScreen(navController, isOrganizer)
+            MainScreen(
+                navController, authViewModel,
+                isOrganizer = isOrganizer
+            )
         }
         composable(Screen.Search.route) {
             SearchScreen(navController, isOrganizer)
@@ -37,4 +40,7 @@ fun AppNavigation(
         }
     }
 }
+
+
+
 

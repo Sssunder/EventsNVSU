@@ -1,10 +1,14 @@
 package com.example.eventsnvsu.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.eventsnvsu.viewmodel.AuthViewModel
@@ -24,7 +28,7 @@ fun MainNavigationScaffold(isOrganizer: Boolean, authViewModel: AuthViewModel) {
                             selected = currentRoute == item.screen.route,
                             onClick = {
                                 navController.navigate(item.screen.route) {
-                                    popUpTo(Screen.Main.route) { NavOptionsBuilder.inclusive = false }
+                                    popUpTo(Screen.Main.route) { inclusive = false }
                                     launchSingleTop = true
                                 }
                             },

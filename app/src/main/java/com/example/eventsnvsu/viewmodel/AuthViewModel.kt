@@ -1,8 +1,8 @@
 package com.example.eventsnvsu.viewmodel
 
-import FirebaseRepository
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.example.eventsnvsu.data.FirebaseRepository
 
 class AuthViewModel : ViewModel() {
     private val repository = FirebaseRepository()

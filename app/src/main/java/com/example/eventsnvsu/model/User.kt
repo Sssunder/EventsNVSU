@@ -7,6 +7,7 @@ import com.google.firebase.database.IgnoreExtraProperties
 data class User(
     val id: String = "",
     val email: String = "",
+    val name: String = "",
     val role: String = "user"
 ) {
     // Обязательный пустой конструктор для Firebase
