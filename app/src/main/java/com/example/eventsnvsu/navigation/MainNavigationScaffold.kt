@@ -1,6 +1,5 @@
 package com.example.eventsnvsu.navigation
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -8,14 +7,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.example.eventsnvsu.viewmodel.AuthViewModel
 
 @Composable
-fun MainNavigationScaffold(isOrganizer: Boolean, authViewModel: AuthViewModel) {
-    val navController = rememberNavController()
+fun MainNavigationScaffold(
+    navController: NavHostController,
+    isOrganizer: Boolean,
+    authViewModel: AuthViewModel
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -39,11 +40,10 @@ fun MainNavigationScaffold(isOrganizer: Boolean, authViewModel: AuthViewModel) {
                 }
             }
         }
-    ) { innerPadding ->
+    ) {
         AppNavigation(
             navController = navController,
             authViewModel = authViewModel,
-            modifier = Modifier.padding(innerPadding),
             isOrganizer = isOrganizer
         )
     }

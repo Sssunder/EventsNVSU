@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.eventsnvsu.R
+import com.example.eventsnvsu.navigation.Screen
 import com.example.eventsnvsu.viewmodel.AuthViewModel
 
 @Composable
@@ -89,7 +90,7 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                 onClick = {
                     // Здесь вы можете добавить код для отправки данных на сервер или сохранения их локально
                     Toast.makeText(context, "Вход успешен", Toast.LENGTH_SHORT).show()
-                    navController.navigate("event_list_screen") // Перенаправление
+                    navController.navigate(Screen.Main.route) // Перенаправление
                 },
                 shape = RoundedCornerShape(16.dp), // Скругленные углы
                 modifier = Modifier
