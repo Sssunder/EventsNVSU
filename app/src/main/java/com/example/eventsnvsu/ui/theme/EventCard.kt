@@ -18,12 +18,12 @@ import androidx.compose.ui.unit.dp
 import com.example.eventsnvsu.model.Event
 
 @Composable
-fun EventCard(event: Event) {
+fun EventCard(event: Event, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { /* TODO: Обработка клика */ },
+            .clickable { onClick() },
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(

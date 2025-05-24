@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.eventsnvsu.data.FirebaseRepository
 import com.example.eventsnvsu.model.Event
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 
 class EventViewModel : ViewModel() {
     private val repository = FirebaseRepository()
     val events = mutableStateListOf<Event>()
+    private var eventsListener: ListenerRegistration? = null
 
     fun loadAllEvents() {
         viewModelScope.launch {
@@ -37,4 +39,29 @@ class EventViewModel : ViewModel() {
             )
         }
     }
+
+    fun observeAllEvents() {
+        eventsListener?.remove()
+        eventsListener = repository.observeEvents(
+            onEventsChanged = { newEvents ->
+                events.clear()
+                events.addAll(newEvents)
+            },
+            onError = { /* Handle error */ }
+        )
+    }
+
+    fun createOrUpdateEvent(event: Event, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        if (event.id.isNullOrEmpty()) {
+            repository.createEvent(event, onSuccess, onFailure)
+        } else {
+            repository.updateEvent(event, onSuccess, onFailure)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        eventsListener?.remove()
+    }
 }
+

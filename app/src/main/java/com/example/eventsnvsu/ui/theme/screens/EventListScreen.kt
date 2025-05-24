@@ -13,33 +13,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.eventsnvsu.data.FirebaseRepository
-import com.example.eventsnvsu.model.Event
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.eventsnvsu.viewmodel.EventViewModel
 import com.example.eventsnvsu.ui.theme.EventCard
 
 @Composable
-fun EventListScreen(navController: NavController) {
-    val context = LocalContext.current
-    val events = remember { mutableStateOf<List<Event>>(emptyList()) }
-    val repository = remember { FirebaseRepository() }
-
+fun EventListScreen(navController: NavController, eventViewModel: EventViewModel = viewModel()) {
+    val events = eventViewModel.events
     LaunchedEffect(Unit) {
-        repository.getEvents(
-            onSuccess = { events.value = it },
-            onFailure = { message ->
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-            }
-        )
+        eventViewModel.observeAllEvents()
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,20 +38,19 @@ fun EventListScreen(navController: NavController) {
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
-
         Spacer(modifier = Modifier.height(16.dp))
-
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(events.value) { event ->
-                EventCard(event = event)
+            items(events.toList()) { event ->
+                EventCard(event = event) {
+                    navController.navigate("event_details/${event.id}")
+                }
             }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

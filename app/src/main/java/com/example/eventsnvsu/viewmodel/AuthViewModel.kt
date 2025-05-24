@@ -32,4 +32,15 @@ class AuthViewModel : ViewModel() {
     ) {
         repository.register(email, password, role, onSuccess, onFailure)
     }
+
+    fun updateProfile(
+        newEmail: String?,
+        newPassword: String?,
+        newName: String?,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        repository.updateProfile(newEmail, newPassword, newName, onSuccess, onFailure)
+    }
 }
+
