@@ -21,13 +21,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.eventsnvsu.model.Event
-import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun EventDetailScreen(
     navController: NavController,
     event: Event,
     isOrganizer: Boolean = false,
+    isAdmin: Boolean = false,
     onEdit: (() -> Unit)? = null,
     onRegister: (() -> Unit)? = null
 ) {
@@ -54,11 +54,11 @@ fun EventDetailScreen(
                 Text(event.location, style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
                 Text(event.description, style = MaterialTheme.typography.bodyLarge)
                 Spacer(Modifier.height(16.dp))
-                if (isOrganizer && onEdit != null) {
+                if ((isOrganizer || isAdmin) && onEdit != null) {
                     Button(onClick = onEdit, modifier = Modifier.fillMaxWidth()) {
                         Text("Редактировать")
                     }
-                } else if (!isOrganizer && onRegister != null) {
+                } else if (!isOrganizer && !isAdmin && onRegister != null) {
                     Button(onClick = onRegister, modifier = Modifier.fillMaxWidth()) {
                         Text("Записаться")
                     }

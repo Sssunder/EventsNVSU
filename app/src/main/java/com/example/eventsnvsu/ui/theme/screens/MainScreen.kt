@@ -3,6 +3,7 @@ package com.example.eventsnvsu.ui.theme.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +17,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,9 +41,23 @@ import com.example.eventsnvsu.viewmodel.AuthViewModel
 fun MainScreen(
     navController: NavHostController,
     authViewModel: AuthViewModel,
-    isOrganizer: Boolean
+    initialIsOrganizer: Boolean = true, // временно, на случай если роль не загрузится
+    contentPadding: PaddingValues = PaddingValues()
 ) {
+    val context = LocalContext.current
     val bottomNavController = rememberNavController()
+    val isOrganizer = authViewModel.currentUserRole.value == "organizer"
+    val isLoggedIn = authViewModel.currentUser != null
+
+    // Если не залогинен — сразу на экран логина
+    LaunchedEffect(isLoggedIn) {
+        if (!isLoggedIn) {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.Main.route) { inclusive = true }
+            }
+        }
+    }
+
     val screens = if (isOrganizer) {
         listOf(Screen.OrganizerEvents, Screen.CreateEvent, Screen.Profile)
     } else {
@@ -53,10 +70,12 @@ fun MainScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(modifier = Modifier.padding(innerPadding).padding(contentPadding)) {
             BottomNavGraph(
                 navController = bottomNavController,
-                isOrganizer = isOrganizer
+                rootNavController = navController, // пробрасываем главный navController
+                isOrganizer = isOrganizer,
+                authViewModel = authViewModel // пробрасываем для SearchScreen
             )
         }
     }
@@ -120,13 +139,13 @@ fun AppleStyleBottomBar(
         }
     }
 }
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MainScreenPreview() {
     EventsNVSUTheme {
         val navController = rememberNavController()
-        val authViewModel = AuthViewModel()
-        val isOrganizer = false // или true, если хочешь посмотреть вариант для организатора
-        MainScreen(navController, authViewModel, isOrganizer)
+        // Для превью используем мок-объект или заменитель ViewModel
+        MainScreen(navController, authViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), initialIsOrganizer = true)
     }
 }

@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.example.eventsnvsu.ui.theme.EventCard
 import com.example.eventsnvsu.viewmodel.EventViewModel
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun OrganizerEventsScreen(navController: NavController, eventViewModel: EventViewModel = viewModel()) {
@@ -50,7 +51,7 @@ fun OrganizerEventsScreen(navController: NavController, eventViewModel: EventVie
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxSize()
         ) {
-            items(events.toList()) { event ->
+            items(events, key = { it.id }) { event ->
                 EventCard(event = event) {
                     val now = System.currentTimeMillis()
                     if (now - lastClickTime < doubleClickThreshold) {
@@ -64,3 +65,4 @@ fun OrganizerEventsScreen(navController: NavController, eventViewModel: EventVie
         }
     }
 }
+

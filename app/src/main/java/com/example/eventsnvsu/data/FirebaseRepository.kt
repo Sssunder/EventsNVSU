@@ -2,6 +2,7 @@ package com.example.eventsnvsu.data
 
 import com.example.eventsnvsu.model.Event
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -10,6 +11,10 @@ class FirebaseRepository {
 
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
+
+    // Добавляем публичное свойство для доступа к текущему пользователю
+    val currentUser: FirebaseUser?
+        get() = auth.currentUser
 
     fun login(email: String, password: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         auth.signInWithEmailAndPassword(email, password)
@@ -32,8 +37,8 @@ class FirebaseRepository {
                         .addOnSuccessListener {
                             onSuccess()
                         }
-                        .addOnFailureListener { e ->
-                            onFailure(e.message ?: "Unknown error")
+                        .addOnFailureListener { e -> // Исправлено на addOnFailureListener
+                            onFailure(e.message ?: "Unknown error") // Исправлено на e.message
                         }
                 } else {
                     onFailure(task.exception?.message ?: "Unknown error")
@@ -52,8 +57,8 @@ class FirebaseRepository {
                     onFailure("User not found")
                 }
             }
-            .addOnFailureListener { e ->
-                onFailure(e.message ?: "Unknown error")
+            .addOnFailureListener { e -> // Исправлено на addOnFailureListener
+                onFailure(e.message ?: "Unknown error") // Исправлено на e.message
             }
     }
 
@@ -69,7 +74,9 @@ class FirebaseRepository {
     }
 
     fun createEvent(event: Event, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
-        db.collection("events").add(event)
+        val docRef = db.collection("events").document()
+        val eventWithId = event.copy(id = docRef.id)
+        docRef.set(eventWithId)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->
                 onFailure(e.message ?: "Ошибка создания мероприятия")
@@ -77,11 +84,11 @@ class FirebaseRepository {
     }
 
     fun updateEvent(event: Event, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
-        if (event.id.isNullOrEmpty()) {
+        if (event.id.isEmpty()) {
             onFailure("Некорректный id мероприятия")
             return
         }
-        db.collection("events").document(event.id!!).set(event)
+        db.collection("events").document(event.id).set(event)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e ->
                 onFailure(e.message ?: "Ошибка обновления мероприятия")
@@ -157,5 +164,9 @@ class FirebaseRepository {
                 .addOnFailureListener { onFailure(it.message ?: "Ошибка обновления имени") }
         }
         onSuccess()
+    }
+
+    fun signOut() {
+        auth.signOut()
     }
 }

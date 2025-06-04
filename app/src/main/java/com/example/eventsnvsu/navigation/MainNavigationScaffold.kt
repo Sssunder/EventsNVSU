@@ -40,11 +40,12 @@ fun MainNavigationScaffold(
                 }
             }
         }
-    ) {
+    ) { innerPadding ->
         AppNavigation(
             navController = navController,
             authViewModel = authViewModel,
-            isOrganizer = isOrganizer
+            isOrganizer = isOrganizer,
+            contentPadding = innerPadding
         )
     }
 }

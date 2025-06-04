@@ -2,28 +2,26 @@ package com.example.eventsnvsu.ui.theme.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import com.example.eventsnvsu.viewmodel.EventViewModel
-import com.example.eventsnvsu.model.Event
-import com.example.eventsnvsu.ui.theme.screens.EventDetailScreen
 import kotlinx.coroutines.launch
 
 @Composable
 fun EventDetailScreenWrapper(
-    navController: NavController,
+    navController: NavHostController,
     eventId: String?,
-    eventViewModel: EventViewModel = viewModel(),
-    isOrganizer: Boolean = false
+    isOrganizer: Boolean,
+    authViewModel: com.example.eventsnvsu.viewmodel.AuthViewModel,
+    eventViewModel: EventViewModel,
+    onEditEvent: () -> Unit,
+    onAddEvent: () -> Unit
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val event = eventViewModel.events.find { it.id == eventId }
+    val isAdmin = authViewModel.currentUserRole.value == "admin"
 
     LaunchedEffect(eventId) {
         eventViewModel.observeAllEvents()
@@ -34,15 +32,15 @@ fun EventDetailScreenWrapper(
             navController = navController,
             event = event,
             isOrganizer = isOrganizer,
+            isAdmin = isAdmin,
             onEdit = {
-                navController.navigate("edit_event/${event.id}")
+                onEditEvent()
             },
             onRegister = {
                 coroutineScope.launch {
-                    eventViewModel.registerForEvent(event.id ?: "")
+                    eventViewModel.registerForEvent(event.id)
                 }
             }
         )
     }
 }
-

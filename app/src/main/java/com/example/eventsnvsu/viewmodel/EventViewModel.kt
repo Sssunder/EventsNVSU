@@ -52,7 +52,7 @@ class EventViewModel : ViewModel() {
     }
 
     fun createOrUpdateEvent(event: Event, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
-        if (event.id.isNullOrEmpty()) {
+        if (event.id.isEmpty()) {
             repository.createEvent(event, onSuccess, onFailure)
         } else {
             repository.updateEvent(event, onSuccess, onFailure)

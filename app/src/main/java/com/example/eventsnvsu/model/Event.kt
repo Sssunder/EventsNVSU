@@ -10,7 +10,9 @@ data class Event(
     val location: String = "",
     val date: String = "",
     val organizerId: String = "",
-    val participants: List<String> = emptyList()
+    val participants: List<String> = emptyList(),
+    val tags: List<String> = emptyList() // Новое поле для тегов/факультета
 ) {
-    constructor() : this("", "", "", "", "", "", emptyList())
+    constructor() : this("", "", "", "", "", "", emptyList(), emptyList())
 }
+

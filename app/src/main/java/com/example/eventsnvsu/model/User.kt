@@ -8,8 +8,8 @@ data class User(
     val id: String = "",
     val email: String = "",
     val name: String = "",
-    val role: String = "user"
+    val role: String = "organizer"
 ) {
     // Обязательный пустой конструктор для Firebase
-    constructor() : this("", "", "user")
+    constructor() : this("", "", "organizer")
 }

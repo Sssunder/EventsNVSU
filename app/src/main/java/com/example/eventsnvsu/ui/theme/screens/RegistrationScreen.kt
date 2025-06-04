@@ -6,17 +6,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,8 +22,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,9 +41,7 @@ import com.example.eventsnvsu.viewmodel.AuthViewModel
 @Composable
 fun RegistrationScreen(navController: NavController, authViewModel: AuthViewModel) {
     val context = LocalContext.current
-    val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
-    val selectedRole = remember { mutableStateOf("user") }
+    val focusManager = LocalFocusManager.current
     // Контейнер с фоном и центрированным контентом
     Box(
         modifier = Modifier
@@ -72,47 +72,64 @@ fun RegistrationScreen(navController: NavController, authViewModel: AuthViewMode
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            // Поля для ввода имени пользователя и пароля
+            // Поля для ввода email, имени пользователя и пароля
+            val email = remember { mutableStateOf("") }
             val username = remember { mutableStateOf("") }
             val password = remember { mutableStateOf("") }
+            val emailFocusRequester = remember { FocusRequester() }
+            val usernameFocusRequester = remember { FocusRequester() }
+            val passwordFocusRequester = remember { FocusRequester() }
 
+            OutlinedTextField(
+                value = email.value,
+                onValueChange = { email.value = it },
+                label = { Text("Email") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(emailFocusRequester),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = {
+                    usernameFocusRequester.requestFocus()
+                })
+            )
             OutlinedTextField(
                 value = username.value,
                 onValueChange = { username.value = it },
                 label = { Text("Имя пользователя") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(usernameFocusRequester),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = {
+                    passwordFocusRequester.requestFocus()
+                })
             )
-
             OutlinedTextField(
                 value = password.value,
                 onValueChange = { password.value = it },
                 label = { Text("Пароль") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(passwordFocusRequester),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = {
+                    focusManager.clearFocus()
+                })
             )
-            Row(Modifier.padding(vertical = 8.dp)) {
-                RadioButton(
-                    selected = selectedRole.value == "user",
-                    onClick = { selectedRole.value = "user" }
-                )
-                Text("Участник", Modifier.align(Alignment.CenterVertically))
-
-                Spacer(Modifier.width(16.dp))
-
-                RadioButton(
-                    selected = selectedRole.value == "organizer",
-                    onClick = { selectedRole.value = "organizer" }
-                )
-                Text("Организатор", Modifier.align(Alignment.CenterVertically))
-            }
             // Кнопка для регистрации
             Button(onClick = {
                 authViewModel.register(
                     email.value,
                     password.value,
-                    selectedRole.value,
-                    onSuccess = { navController.navigate(Screen.Login.route) },
-                    onFailure = { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+                    "user", // всегда обычный пользователь
+                    onSuccess = {
+                        Toast.makeText(context, "Аккаунт успешно создан", Toast.LENGTH_SHORT).show()
+                        navController.navigate(Screen.Login.route)
+                    },
+                    onFailure = { error: String ->
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                    }
                 )
             }) {
                 Text("Зарегистрироваться")
@@ -121,7 +138,7 @@ fun RegistrationScreen(navController: NavController, authViewModel: AuthViewMode
             // Дополнительная информация или кнопка для входа
             TextButton(onClick = {
                 // Логика для входа или другого действия
-                navController.navigate("login_screen") // Перенаправление на экран входа
+                navController.navigate("login") // Перенаправление на экран входа
             }) {
                 Text(
                     text = "Уже есть аккаунт? " +
@@ -138,8 +155,7 @@ fun RegistrationScreen(navController: NavController, authViewModel: AuthViewMode
 @Composable
 fun RegistrationScreenPreview() {
     val navController = rememberNavController()
-    val authViewModel = AuthViewModel() // Создайте экземпляр AuthViewModel здесь
+    val authViewModel: AuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     RegistrationScreen(navController, authViewModel)
 }
-
 
