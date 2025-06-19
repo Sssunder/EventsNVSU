@@ -1,7 +1,7 @@
 [versions]
 agp = "8.10.1"
 kotlin = "2.0.0"
-coreKtx = "1.16.0"
+coreKtx = "2.7.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -17,15 +17,18 @@ comGoogleGmsGoogleServicesGradlePlugin = "4.4.2"
 firebaseBom = "33.14.0"
 firebaseAnalytics = "22.4.0"
 firebaseFirestoreKtx = "25.1.4"
-
+coilKtx = "2.6.0"
+firebaseMessagingKtx = "24.1.1"
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage-ktx", version = "21.0.2" }
+coil-kt = { group = "io.coil-kt", name = "coil-compose", version.ref = "coreKtx" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.16.0" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore-ktx", name = "firebase-firestore-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version = "3.6.1" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.12.0-alpha01" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -42,6 +45,8 @@ google-services = { group = "com.google.gms", name = "google-services", version.
 com-google-gms-google-services-gradle-plugin = { group = "com.google.gms.google-services", name = "com.google.gms.google-services.gradle.plugin", version.ref = "comGoogleGmsGoogleServicesGradlePlugin" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
 firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version = "1.6.7" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

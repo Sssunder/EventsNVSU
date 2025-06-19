@@ -8,7 +8,8 @@ data class User(
     val id: String = "",
     val email: String = "",
     val name: String = "",
-    val role: String = "organizer"
+    val role: String = "organizer",
+    val photoUrl: String? = null // Новое поле для фото профиля
 ) {
     // Обязательный пустой конструктор для Firebase
     constructor() : this("", "", "organizer")

@@ -1,5 +1,7 @@
 package com.example.eventsnvsu.ui.theme.screens
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,22 +22,24 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.eventsnvsu.navigation.BottomNavGraph
 import com.example.eventsnvsu.navigation.Screen
 import com.example.eventsnvsu.navigation.getIconForRoute
 import com.example.eventsnvsu.navigation.getLabelForRoute
 import com.example.eventsnvsu.ui.theme.EventsNVSUTheme
 import com.example.eventsnvsu.viewmodel.AuthViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     navController: NavHostController,
@@ -44,40 +47,35 @@ fun MainScreen(
     initialIsOrganizer: Boolean = true, // временно, на случай если роль не загрузится
     contentPadding: PaddingValues = PaddingValues()
 ) {
-    val context = LocalContext.current
-    val bottomNavController = rememberNavController()
     val isOrganizer = authViewModel.currentUserRole.value == "organizer"
     val isLoggedIn = authViewModel.currentUser != null
 
     // Если не залогинен — сразу на экран логина
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn) {
-            navController.navigate(Screen.Login.route) {
-                popUpTo(Screen.Main.route) { inclusive = true }
+            navController.navigate(com.example.eventsnvsu.navigation.Screen.Login.route) {
+                popUpTo(com.example.eventsnvsu.navigation.Screen.Main.route) { inclusive = true }
             }
         }
     }
 
-    val screens = if (isOrganizer) {
-        listOf(Screen.OrganizerEvents, Screen.CreateEvent, Screen.Profile)
-    } else {
-        listOf(Screen.EventList, Screen.Search, Screen.Profile)
-    }
-
-    Scaffold(
-        bottomBar = {
-            AppleStyleBottomBar(bottomNavController, screens)
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding).padding(contentPadding)) {
-            BottomNavGraph(
-                navController = bottomNavController,
-                rootNavController = navController, // пробрасываем главный navController
-                isOrganizer = isOrganizer,
-                authViewModel = authViewModel // пробрасываем для SearchScreen
+    // Градиентный фон с блюром (уникальный для главного экрана)
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .background(Color.Transparent)
+    ) {
+        Canvas(modifier = Modifier.matchParentSize().blur(24.dp)) {
+            drawRect(
+                brush = Brush.linearGradient(
+                    colors = listOf(Color(0xFF165DAC), Color(0xFF36D1DC), Color(0xFFB2FEFA)),
+                    start = Offset(0f, size.height * 0.2f),
+                    end = Offset(size.width, size.height)
+                ),
+                size = size
             )
         }
+        // Основной контент — большие карточки мероприятий на свайпе
+        EventListScreen(navController = navController)
     }
 }
 
@@ -145,7 +143,7 @@ fun AppleStyleBottomBar(
 fun MainScreenPreview() {
     EventsNVSUTheme {
         val navController = rememberNavController()
-        // Для превью используем мок-объект или заменитель ViewModel
+        // Для превью используе�� мок-объект или заменитель ViewModel
         MainScreen(navController, authViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), initialIsOrganizer = true)
     }
 }

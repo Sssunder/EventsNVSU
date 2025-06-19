@@ -40,6 +40,29 @@ fun EventDetailScreenWrapper(
                 coroutineScope.launch {
                     eventViewModel.registerForEvent(event.id)
                 }
+            },
+            onFollow = { isFollowing ->
+                coroutineScope.launch {
+                    if (isFollowing) {
+                        eventViewModel.followEvent(event.id,
+                            onSuccess = {
+                                android.widget.Toast.makeText(context, "Вы подписались на уведомления о мероприятии", android.widget.Toast.LENGTH_SHORT).show()
+                            },
+                            onFailure = {
+                                android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    } else {
+                        eventViewModel.unfollowEvent(event.id,
+                            onSuccess = {
+                                android.widget.Toast.makeText(context, "Вы отписались от уведомлений о мероприятии", android.widget.Toast.LENGTH_SHORT).show()
+                            },
+                            onFailure = {
+                                android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+                }
             }
         )
     }

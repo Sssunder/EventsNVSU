@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.eventsnvsu.ui.theme.screens.LoginScreen
-import com.example.eventsnvsu.ui.theme.screens.MainScreen
 import com.example.eventsnvsu.ui.theme.screens.RegistrationScreen
 import com.example.eventsnvsu.viewmodel.AuthViewModel
 
@@ -26,7 +25,17 @@ fun AppNavigation(
             RegistrationScreen(navController, authViewModel)
         }
         composable(Screen.Main.route) {
-            MainScreen(navController, authViewModel, isOrganizer, contentPadding)
+            MainNavigationScaffold(
+                navController = navController,
+                isOrganizer = isOrganizer,
+                authViewModel = authViewModel
+            )
+        }
+        composable(Screen.EmailVerification.route) {
+            com.example.eventsnvsu.ui.theme.screens.EmailVerificationScreen(navController, authViewModel)
+        }
+        composable("user_events") {
+            com.example.eventsnvsu.ui.theme.screens.UserEventsScreen(navController)
         }
     }
 }

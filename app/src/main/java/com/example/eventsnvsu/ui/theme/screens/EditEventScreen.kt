@@ -1,11 +1,9 @@
 package com.example.eventsnvsu.ui.theme.screens
 
 import android.widget.Toast
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,14 +23,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.eventsnvsu.model.Event
 import com.example.eventsnvsu.viewmodel.EventViewModel
-import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun EditEventScreen(
     navController: NavController,
@@ -41,13 +39,22 @@ fun EditEventScreen(
 ) {
     val context = LocalContext.current
     val event = eventViewModel.events.find { it.id == eventId }
-    val isEdit = event != null
-    val title = remember { mutableStateOf(event?.title ?: "") }
-    val description = remember { mutableStateOf(event?.description ?: "") }
-    val location = remember { mutableStateOf(event?.location ?: "") }
-    val date = remember { mutableStateOf(event?.date ?: "") }
-    val tags = remember { mutableStateOf(event?.tags?.joinToString(", ") ?: "") }
-    val organizerId = event?.organizerId ?: FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+    val isLoading = event == null
+    androidx.compose.runtime.LaunchedEffect(eventId) {
+        if (event == null && eventId != null) {
+            eventViewModel.observeAllEvents()
+        }
+    }
+    if (isLoading) {
+        Text("Загрузка мероприятия...", modifier = Modifier.padding(24.dp))
+        return
+    }
+    val title = remember { mutableStateOf(event.title) }
+    val description = remember { mutableStateOf(event.description) }
+    val location = remember { mutableStateOf(event.location) }
+    val date = remember { mutableStateOf(event.date) }
+    val tags = remember { mutableStateOf(event.tags.joinToString(", ")) }
+    val organizerId = event.organizerId
 
     // DatePicker
     val showDatePicker = remember { mutableStateOf(false) }
@@ -73,9 +80,9 @@ fun EditEventScreen(
         }
     }
 
-    Column(Modifier.padding(16.dp)) {
-        Text(if (isEdit) "Редактировать мероприятие" else "Создать мероприятие")
-        Spacer(Modifier.padding(8.dp))
+    val chatLink = remember { mutableStateOf(event.chatLink ?: "") }
+
+    Column(Modifier.padding(24.dp).verticalScroll(rememberScrollState())) {
         OutlinedTextField(
             value = title.value,
             onValueChange = { title.value = it },
@@ -83,7 +90,7 @@ fun EditEventScreen(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             maxLines = 1,
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
         )
         OutlinedTextField(
             value = description.value,
@@ -92,43 +99,31 @@ fun EditEventScreen(
             modifier = Modifier.fillMaxWidth(),
             singleLine = false,
             maxLines = 5,
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Default)
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
         )
-        // Место проведения
-        Row(Modifier.fillMaxWidth()) {
-            OutlinedTextField(
-                value = location.value,
-                onValueChange = { location.value = it },
-                label = { Text("Место") },
-                modifier = Modifier.weight(1f),
-                singleLine = false,
-                maxLines = 2,
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Default)
-            )
-            Spacer(Modifier.padding(4.dp))
-            Button(onClick = {
-                // TODO: интеграция с Яндекс.Картами
-                Toast.makeText(context, "Выбор места на карте пока не реализован", Toast.LENGTH_SHORT).show()
-            }, modifier = Modifier.alignByBaseline()) {
-                Text("Выбрать на карте")
+        OutlinedTextField(
+            value = location.value,
+            onValueChange = { location.value = it },
+            label = { Text("Место") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = false,
+            maxLines = 2,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+        )
+        OutlinedTextField(
+            value = date.value,
+            onValueChange = { date.value = it },
+            label = { Text("Дата") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            maxLines = 1,
+            trailingIcon = {
+                Text(
+                    "\uD83D\uDCC5",
+                    modifier = Modifier.clickable { showDatePicker.value = true }
+                )
             }
-        }
-        // Дата
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { showDatePicker.value = true }
-        ) {
-            OutlinedTextField(
-                value = date.value,
-                onValueChange = {},
-                label = { Text("Дата") },
-                modifier = Modifier.fillMaxWidth(),
-                readOnly = true,
-                singleLine = true,
-                maxLines = 1
-            )
-        }
+        )
         OutlinedTextField(
             value = tags.value,
             onValueChange = { tags.value = it },
@@ -136,25 +131,33 @@ fun EditEventScreen(
             modifier = Modifier.fillMaxWidth(),
             singleLine = false,
             maxLines = 2,
-            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Default)
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
         )
-        Spacer(Modifier.padding(8.dp))
+        OutlinedTextField(
+            value = chatLink.value,
+            onValueChange = { chatLink.value = it },
+            label = { Text("Ссылка на чат (например, Telegram)") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            maxLines = 1,
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done)
+        )
         Button(onClick = {
-            val newEvent = Event(
+            val updatedEvent = event.copy(
                 title = title.value,
                 description = description.value,
                 location = location.value,
                 date = date.value,
-                organizerId = organizerId,
-                tags = tags.value.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                tags = tags.value.split(",").map { it.trim() }.filter { it.isNotEmpty() },
+                chatLink = chatLink.value
+                // imageUrl не обновляется, только локально
             )
-            eventViewModel.createOrUpdateEvent(newEvent,
+            eventViewModel.createOrUpdateEvent(updatedEvent,
                 onSuccess = { navController.popBackStack() },
                 onFailure = { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
             )
-        }, modifier = Modifier.fillMaxWidth()) {
-            Text("Сохранить")
+        }, modifier = Modifier.padding(top = 16.dp)) {
+            Text("Сохранить изменения")
         }
     }
 }
-

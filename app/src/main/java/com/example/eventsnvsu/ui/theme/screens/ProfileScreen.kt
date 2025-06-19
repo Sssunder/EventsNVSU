@@ -1,5 +1,9 @@
 package com.example.eventsnvsu.ui.theme.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,11 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -32,8 +36,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -47,14 +54,15 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel = viewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    var email by remember { mutableStateOf(authViewModel.currentUser?.email ?: "") }
+    var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var editMode by remember { mutableStateOf(false) }
+    var showUserEvents by remember { mutableStateOf(false) }
     val role = when (authViewModel.currentUserRole.value) {
         "admin" -> "Администратор"
         "organizer" -> "Организатор"
-        "participant" -> "Участник"
+        "user" -> "Участник"
         else -> "Не определена"
     }
 
@@ -64,11 +72,30 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
         if (n.isNotBlank()) n.take(2).uppercase() else "?"
     }
 
+    var photoUrl by remember { mutableStateOf(authViewModel.currentUser?.photoUrl ?: "") }
     LaunchedEffect(authViewModel.currentUser) {
-        // Можно подгрузить имя из Firestore, если оно есть
         authViewModel.refreshUser()
-        // name = ... (если реализовано хранение имени)
+        authViewModel.loadCurrentUserName { loadedName ->
+            name = loadedName
+        }
         email = authViewModel.currentUser?.email ?: ""
+        // Загружаем photoUrl из Firestore
+        val user = authViewModel.currentUser
+        if (user != null) {
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users").document(user.uid).get()
+                .addOnSuccessListener { doc ->
+                    val url = doc.getString("photoUrl") ?: ""
+                    photoUrl = url
+                }
+        }
+    }
+
+    val context = LocalContext.current
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        selectedImageUri = uri
+        // Только выбор иконки, не загружаем и не сохраняем фото
     }
 
     Box(
@@ -76,6 +103,15 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        // Размытый фон eventlogo
+        Image(
+            painter = painterResource(id = com.example.eventsnvsu.R.drawable.eventlogo),
+            contentDescription = null,
+            modifier = Modifier
+                .matchParentSize()
+                .blur(32.dp),
+            alpha = 0.25f
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -83,26 +119,18 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
-            // Аватарка (заглушка)
-            Box(
+            // Логотип без круга, с обрезкой по центру и плавным скруглением
+            Image(
+                painter = painterResource(id = com.example.eventsnvsu.R.drawable.eventlogo),
+                contentDescription = "Avatar",
                 modifier = Modifier
-                    .size(96.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Avatar",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(64.dp)
-                )
-                // В будущем можно заменить на Image(...)
-            }
+                    .size(240.dp) // увеличен размер логотипа
+                    .clip(RoundedCornerShape(32.dp))
+            )
             Spacer(modifier = Modifier.height(16.dp))
             // Имя и email
             Text(
-                text = name.ifBlank { "Имя пользователя" },
+                text = name.ifBlank { "ФИО" },
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 4.dp)
@@ -124,7 +152,7 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Имя") },
+                    label = { Text("ФИО") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
@@ -173,6 +201,20 @@ fun ProfileScreen(navController: NavHostController, authViewModel: AuthViewModel
                 }
             }
             Spacer(modifier = Modifier.height(32.dp))
+            // Кнопка просмотра ближайших мероприятий
+            Button(
+                onClick = {
+                    navController.navigate("user_events")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Icon(Icons.Default.Archive, contentDescription = "Архив мероприятий", tint = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Мои мероприятия", color = Color.White)
+            }
             // Кнопка выхода
             Button(
                 onClick = {

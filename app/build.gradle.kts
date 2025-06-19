@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.eventsnvsu"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.eventsnvsu"
@@ -58,12 +58,16 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.auth.ktx)
+    implementation(libs.coil.kt)
+    implementation(libs.firebase.messaging.ktx)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.material.icons.extended)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
 apply(plugin = "com.google.gms.google-services")

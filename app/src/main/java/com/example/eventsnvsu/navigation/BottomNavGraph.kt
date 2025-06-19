@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.eventsnvsu.ui.theme.screens.CreateEventScreen
 import com.example.eventsnvsu.ui.theme.screens.EditEventScreen
 import com.example.eventsnvsu.ui.theme.screens.EventDetailScreenWrapper
 import com.example.eventsnvsu.ui.theme.screens.EventListScreen
@@ -64,11 +65,11 @@ fun BottomNavGraph(
         }
         // Делаем маршрут создания мероприятия доступным для всех
         composable(Screen.CreateEvent.route) {
-            EditEventScreen(navController, eventId = null)
+            CreateEventScreen(navController)
         }
 
         composable(Screen.Profile.route) {
-            ProfileScreen(rootNavController, authViewModel)
+            ProfileScreen(navController, authViewModel)
         }
 
         composable("event_details/{eventId}") { backStackEntry ->
@@ -90,6 +91,10 @@ fun BottomNavGraph(
         composable("edit_event/{eventId}") { backStackEntry ->
             val eventId = backStackEntry.arguments?.getString("eventId")
             EditEventScreen(navController, eventId)
+        }
+
+        composable("user_events") {
+            com.example.eventsnvsu.ui.theme.screens.UserEventsScreen(navController, eventViewModel)
         }
     }
 }

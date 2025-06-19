@@ -52,10 +52,38 @@ class EventViewModel : ViewModel() {
     }
 
     fun createOrUpdateEvent(event: Event, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        val currentUid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
         if (event.id.isEmpty()) {
-            repository.createEvent(event, onSuccess, onFailure)
+            // При создании события всегда подставляем organizerId текущего пользователя
+            val eventWithOrganizer = event.copy(organizerId = currentUid ?: "")
+            repository.createEvent(eventWithOrganizer, onSuccess, onFailure)
         } else {
             repository.updateEvent(event, onSuccess, onFailure)
+        }
+    }
+
+    fun followEvent(eventId: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        viewModelScope.launch {
+            repository.followEvent(eventId, onSuccess, onFailure)
+        }
+    }
+
+    fun unfollowEvent(eventId: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        viewModelScope.launch {
+            repository.unfollowEvent(eventId, onSuccess, onFailure)
+        }
+    }
+
+    fun deleteEvent(eventId: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        viewModelScope.launch {
+            repository.deleteEvent(eventId,
+                onSuccess = {
+                    // После удаления обновляем список
+                    loadAllEvents()
+                    onSuccess()
+                },
+                onFailure = { onFailure(it) }
+            )
         }
     }
 
@@ -64,4 +92,3 @@ class EventViewModel : ViewModel() {
         eventsListener?.remove()
     }
 }
-

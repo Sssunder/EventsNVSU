@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="EventsNVSU.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-31T10:44:32.336312600Z">
+        <DropdownSelection timestamp="2025-06-04T15:31:35.513248700Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\koten\.android\avd\Medium_Phone.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=59f7d29c" />
             </handle>
           </Target>
         </DropdownSelection>
