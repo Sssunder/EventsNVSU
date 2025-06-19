@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,14 +25,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.eventsnvsu.ui.theme.EventCard
+import com.example.eventsnvsu.viewmodel.AuthViewModel
 import com.example.eventsnvsu.viewmodel.EventViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrganizerEventsScreen(navController: NavController, eventViewModel: EventViewModel = viewModel()) {
     val events = eventViewModel.events
@@ -58,6 +65,9 @@ fun OrganizerEventsScreen(navController: NavController, eventViewModel: EventVie
 
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    var selectedEventId by remember { mutableStateOf<String?>(null) }
+    val sheetState = rememberModalBottomSheetState()
+    val authViewModel: AuthViewModel = viewModel()
 
     Column(
         modifier = Modifier
@@ -85,7 +95,7 @@ fun OrganizerEventsScreen(navController: NavController, eventViewModel: EventVie
                             if (now - lastClickTime < doubleClickThreshold) {
                                 navController.navigate("edit_event/${event.id}")
                             } else {
-                                navController.navigate("event_details/${event.id}")
+                                selectedEventId = event.id
                             }
                             lastClickTime = now
                         }
@@ -128,6 +138,27 @@ fun OrganizerEventsScreen(navController: NavController, eventViewModel: EventVie
                         }
                     )
                 }
+            }
+        }
+        // --- Модальное окно с деталями мероприятия ---
+        if (selectedEventId != null) {
+            ModalBottomSheet(
+                onDismissRequest = { selectedEventId = null },
+                sheetState = sheetState,
+                containerColor = Color.Transparent,
+                scrimColor = Color.Black.copy(alpha = 0.45f)
+            ) {
+                EventDetailScreenWrapper(
+                    navController = navController as NavHostController,
+                    eventId = selectedEventId,
+                    isOrganizer = true,
+                    authViewModel = authViewModel,
+                    eventViewModel = eventViewModel,
+                    onEditEvent = {
+                        selectedEventId?.let { navController.navigate("edit_event/$it") }
+                    },
+                    onAddEvent = {}
+                )
             }
         }
     }
